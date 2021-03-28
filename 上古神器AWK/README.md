@@ -1,6 +1,8 @@
-# 										       							    							 					    						   上古神器AWK
+# 										       							    							 					    上古神器AWK
 
-### 前言
+[TOC]
+
+## 前言
 
 哈喽，大家好，今天给大家介绍一个非常之牛逼的Unix工具AWK。AWK是1977年贝尔实验室的三个哥们( [Alfred Aho](http://en.wikipedia.org/wiki/Alfred_Aho)、[Peter Weinberger](http://en.wikipedia.org/wiki/Peter_J._Weinberger)、 [Brian Kernighan](http://en.wikipedia.org/wiki/Brian_Kernighan) )搞出来的文本分析工具，这三个哥们的首字母拼起来就是AWK的名字了。AWK虽然是上个世纪的产物，但是它的简洁和丰富的功能可以称之为**神器**！！！ 它处理文本就像其他语言处理数值一样方便, 所以经常被应用在文本处理领域，比如日志分析、数据清洗、文本过滤、数据统计等。同时它也是一门编程语言，不过它的命令行用法就可以覆盖大多数的应用场景，我们通常可以使用一行AWK命令完成一个脚本的任务！！！
 
@@ -14,7 +16,7 @@
 # 日志格式：{服务}|{日期}|{业务}|{请求URL}|{返回状态}|{请求耗时}|{请求参数}|{返回参数}...
 ```
 
-比如统计文件CSV文件，采用","来分割。
+比如CSV文件，采用","来分割。
 
 ```shell
 # CSV格式：field1,field2,field3...
@@ -22,7 +24,7 @@
 
 **(2)    每一列代表固定含义，便于统计**
 
-​	跟关系型数据库类似，统计文件的每一行的相同列代表同一个含义的数据，这样才具有数据分析意义，便于统计，比如本文演示数据(各地区户口登记地在外乡镇街道的人口状况)，第一列表示地区，第二列表示总人口等。
+跟关系型数据库类似，统计文件的每一行的相同列代表同一个含义的数据，这样才具有数据分析意义，比如本文演示数据(各地区户口登记地在外乡镇街道的人口状况)，第一列表示地区，第二列表示总人口等。
 
 ```shell
 $ cat population.txt|head -n 5
@@ -32,21 +34,23 @@ $ cat population.txt|head -n 5
 天津    4952225     1095282      865442         2991501
 ```
 
-### 基本用法
+## 基本用法
 
 一个AWK程序的组成非常简单，它是由一个或多个 模式–动作 语句组成的序列。
 
 ```shell
-awk 'pattern {action}' input files
+### 一个 模式-动作
+awk 'pattern {action}' input_files
+
+### 多个 模式-动作
+awk 'pattern {action} pattern {action} pattern {action} ...' input_files
 ```
-
-
 
 AWK会每次读取一个输入行，对读取到的每一行，按顺序检查每一个模式。如果当前行与模式匹配，则执行对应动作。
 
 <img src="https://wetalk-1300208549.cos.ap-nanjing.myqcloud.com/drawImage/awk%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="AWK" style="zoom: 67%;" />
 
-AWK伪代码，我猜的  (\*^_^\*)
+AWK在自动地扫描输入文件的同时, 并把每一个输入行切分成字段。许多工作都是自动完成的：包括输入, 字段分割, 存储管理, 初始化。AWK伪代码，我猜的  (\*^_^\*)
 
 ```shell
 ### AWK伪代码  我猜的 (*^_^*)
@@ -64,11 +68,10 @@ while(getline(inputfile))
 }
 ```
 
-awk 自动地扫描输入文件, 并把每一个输入行切分成字段。许多工作都是自动完成的：包括输入, 字段分割, 存储管理, 初始化。
+## 上手使用
 
 ```shell
-### AWK会每次读取一个输入行, 对读取到的每一行, 按顺序检查每一个模式. 对每一个与当前行匹配的模式, 对应的动作就会执行,一个缺失的模式匹配每一个输入行,
-### awk 的基本操作是在由输入行组成的序列中, 陆续地扫描每一行, 搜索可以被模式 匹配 (match) 的行. “匹配” 的精确含义依赖于问题中的模式
+### AWK会每次读取一个输入行, 对读取到的每一行, 按顺序检查每一个模式. 对每一个与当前行匹配的模式, 对应的动作就会执行,一个缺失的模式匹配每一个输入行。
 awk 'program' input files
 awk '{print "hello world"}' population.txt
 awk '{print $0}' population.txt
@@ -85,7 +88,7 @@ awk 'NR>2 {print "pre_"$1"_end"}' population.txt
 ### 内建变量表格列举
 ```
 
-与传统语言编写的程序相比, awk 程序简短得多. Awk 最常用的用途就是前面提到的那些工作. 因为 awk 程序一般都很短, 所以人们经常这样使用它: 通过键盘在命令行中输入程序代码 (只有一两行), 执行, 然后把代码丢弃。实际上, awk 是一个通用编程工具, 许多专用工具都可以用它来替代。
+与传统语言编写的程序相比, 
 
 ```shell
 ### awk 的基本操作是在由输入行组成的序列中, 陆续地扫描每一行, 搜索可以被模式 匹配 (match) 的行. “匹配” 的精确含义依赖于问题中的模式
@@ -124,7 +127,7 @@ awk 'BEGIN {for(i=0;i<ARGC;i++) printf "%s\t",ARGV[i]; print ""}' population.txt
 awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print addr[i];i-=1}}' population.txt
 ```
 
-### 模式
+## 模式
 
 ```shell
 # 模式汇总 
@@ -151,7 +154,7 @@ awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print addr[i];i-=1}}' population.txt
 # 正则表达式
 ```
 
-### 动作
+## 动作
 
 一个动作就是一个语句序列, 语句之间用分号或换行符分开
 
@@ -159,7 +162,7 @@ awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print addr[i];i-=1}}' population.txt
 
 ```
 
-### 正则表达式
+## 正则表达式
 
 ```shell
 ###字符串匹配模式
@@ -177,18 +180,18 @@ awk '/f.n/' <<< `echo -e "cat\nbat\nfun\nfin\nfan"`
 ### 演示一下范围模式  FNR演示
 ```
 
-### 内建函数
+## 内建函数
 
 ```shell
 ### 内建算数函数 例子演示
 ### 内建字符串函数 例子演示
 ```
 
-### 命令行参数
+## 命令行参数
 
-### 输出到文件/管道
+## 输出到文件/管道
 
-### 文件拆分&分析
+## 文件拆分&分析
 
 ```shell
 ### CSV
@@ -196,7 +199,7 @@ awk '/f.n/' <<< `echo -e "cat\nbat\nfun\nfin\nfan"`
 # 并集、交集、差集、子集，类比于mysql 中 join、where in 操作等
 ```
 
-### 附录
+## 附录
 
 ```shell
 ### 参考 表2.4: 模式
