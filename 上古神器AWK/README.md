@@ -46,7 +46,7 @@ AWK会每次读取一个输入行，对读取到的每一行，按顺序检查�
 
 <img src="https://wetalk-1300208549.cos.ap-nanjing.myqcloud.com/drawImage/awk%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="AWK" style="zoom: 67%;" />
 
-AWK伪代码，我猜的 (*^_^*)
+AWK伪代码，我猜的  (\*^_^\*)
 
 ```shell
 ### AWK伪代码  我猜的 (*^_^*)
