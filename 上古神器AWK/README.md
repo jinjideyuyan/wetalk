@@ -24,9 +24,8 @@
 
 跟关系型数据库类似，统计文件的每一行的相同列代表同一个含义的数据，这样才具有数据分析意义，比如本文演示数据，第一列表示地区，第二列表示总人口等。
 
-> 演示数据来源于国家统计局：各地区户口登记地在外乡镇街道的人口状况
+> 演示数据来源于国家统计局：各地区户口登记地在外乡镇街道的人口状况。由于演示数据文件行数太多占用篇幅较长，以下演示均只展示前几条数据。
 >
-> 由于演示数据文件行数太多占用篇幅较长，以下演示均只展示前几条数据。
 
 ```shell
 $ cat population.txt|head -n 10
@@ -76,7 +75,9 @@ while(getline(inputfile))
 
 <img src="https://wetalk-1300208549.cos.ap-nanjing.myqcloud.com/drawImage/awk%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="AWK" style="zoom: 67%;" />
 
-AWK在自动地扫描输入文件的同时, 也会按照分隔符(默认空格/Tab)把每一个输入行切分成字段。其中$0表示整行，$1,$2...$n对应表示第一列，第二列...第N列。
+AWK在自动扫描输入文件的同时, 也会按照分隔符(默认空格/Tab)把每一个输入行切分成字段。其中$0表示整行，$1,$2...$n对应表示第一列，第二列...第N列。我们可以用打印语句来验证。
+
+> 使用print函数由逗号分隔不同的参数，打印结果用空格符分隔，并且会自动换行。(类似于各大语言println函数)。
 
 ```shell
 $ awk '{print "hello",$0}' population.txt|head -n 5
@@ -87,74 +88,114 @@ hello 天津    4952225     1095282      865442         2991501
 hello 河北    8297279     4263957      2628649        1404673
 ```
 
-AWK还提供了很多有用的内置变量，如 NR
+AWK还提供了很多有用的内置变量，如 
+
+NR  (Number Of Record) ：表示读取到的记录数，即当前行号 
+
+FILENAME ：表示当前输入的文件名
+
+NF (Number Of Field) ：表示当前记录的字段个数，即总共多少列，我们通常用这个变量提取一行的最后一列，如下例子所示，总共有5列，$NF代表的就是第五列的值，等价于$5，$(NF-1)表示倒数第二列的值。
 
 ```shell
-$ awk '{print NR,$1,$3}' population.txt|head -n 5
-1 地区 本县/市/区
-2 全国 90372599
-3 北京 1582574
-4 天津 1095282
-5 河北 4263957
+$ awk '{print FILENAME,NR,$1,$3,NF,$NF}' population.txt|head -n 5
+population.txt 1 地区 本县/市/区 5 省外
+population.txt 2 全国 90372599 5 85876337
+population.txt 3 北京 1582574 5 7044533
+population.txt 4 天津 1095282 5 2991501
+population.txt 5 河北 4263957 5 1404673
 ```
 
-## 上手使用
+**常用的内置变量在附录总结**，方便大家查阅。
 
-接下来怎么办呢
-
-```shell
-awk '{print NR,$0}' population.txt
-awk 'NR>2 {print NR,$1,$2-$3}' population.txt
-awk 'NR>2 {print NR,$1,$2-$3,$NF}' population.txt
-awk 'NR>2 && $2>5302276 {print NR,$1,$2}' population.txt
-awk 'NR==1 || $2>5302276 {print NR,$1,$2}' population.txt
-awk 'NR==1 || $2-5302276>0{print NR,$1,$2}' population.txt
-awk 'length($1) > 6 {print length($1)}' population.txt
-awk 'NR>2 {print "pre_"$1"_end"}' population.txt
-
-### 演示printf
-### 内建变量表格列举
-```
-
-
+AWK也提供了格式化输出，等价于C语言的printf，格式化规则可以参考：https://en.cppreference.com/w/c/io/fprintf
 
 ```shell
-### 文件结束标志 (Unix 系统是组合键 Control-d
-### 演示标准输入
-
-### 例子
-awk '$3 > 0 { print $1, $2 * $3 }' emp.data Kathy 40
-Mark 100
-Mary 121
-Susie 76.5
-```
-
-```shell
-# 同一行多语句采用;分隔
-# print  默认用一个空格符分隔  等于println  例子 print ""
 # printf 格式化输出  printf(format, value1, value2, ... , valuen)
-# 模式控制着动作的执行: 当模式匹配时, 相应的动作便会执行
+# todo 补充例子
 ```
 
+## 模式过滤
+
+上面介绍了动作的使用，动作通常用来用来输出展示，模式用来过滤我们想要的记录，如下筛选（行号>1 且 第一列大于11074525）的行。
+
 ```shell
-### 特殊模式
-### BEGIN 与 END
-awk 'BEGIN {print "AREA TOTAL LOCAL OTHER OUTLAND"} NR>2{print}' population.txt
-awk 'BEGIN{OFS=",";print "AREA,TOTAL,LOCAL,OTHER,OUTLAND"} NR>2{print $1,$2,$3,$4,$5}' population.txt
+### AWK的变量也可以自由进行算术运算(加减乘除)，比如 $2-$3
+$ awk 'NR>1 && $2>11074525 {print NR,$1,$2,$2-$3}' population.txt
+2 全国 260937942 170565343
+11 上海 12685316 11016029
+12 江苏 18226819 13681789
+13 浙江 19900863 15274032
+17 山东 13698321 7123530
+21 广东 36806649 31390437
+25 四川 11735152 6913850
+```
+
+AWK的字符串拼接跟shell一样简单粗暴，不需要使用任何运算符，将两个字符串并排放在一起就能实现拼接。
+
+```shell
+$ awk 'NR>1 {print NR,"pre_"$1"_end"}' population.txt|head -n 5
+2 pre_全国_end
+3 pre_北京_end
+4 pre_天津_end
+5 pre_河北_end
+6 pre_山西_end
+```
+
+内建函数  多展示几个。。。
+
+```shell
+### 系统编码&文件编码均为UTF-8
+$ awk 'length($1) > 6 {print $1,"占用长度：",length($1)}' population.txt
+内蒙古 占用长度： 9
+黑龙江 占用长度： 9
+```
+
+AWK还提供一些特殊的模式，比如 BEGIN 和 END。
+
+这两个模式不匹配任何输入行。当 awk读取数据前，BEGIN 的语句开始执行; 当所有数据被处理完毕，END 的语句开始执行。所以它们通常用于初始化与扫尾。
+
+```shell
+### 多个 "模式-动作" 并排写就行。
+$ awk 'BEGIN {print "AREA TOTAL LOCAL OTHER OUTLAND"} NR>2{print}' population.txt|head -n 5
+AREA TOTAL LOCAL OTHER OUTLAND
+北京    10498288    1582574      1871181        7044533
+天津    4952225     1095282      865442         2991501
+河北    8297279     4263957      2628649        1404673
+山西    6764665     3643627      2189385        931653
+```
+
+OFS (Output Formmat Separate) 也是一个内建变量：指定输出字段分割符，如下指定输出时字段采用逗号进行分割。
+
+> 动作里的多个语句之间使用分号进行分割，如下BEGIN里的动作
+
+```shell
+$ awk 'BEGIN{OFS=",";print "AREA,TOTAL,LOCAL,OTHER,OUTLAND"} NR>2{print $1,$2,$3,$4,$5}' population.txt|head -n 5
+AREA,TOTAL,LOCAL,OTHER,OUTLAND
+北京,10498288,1582574,1871181,7044533
+天津,4952225,1095282,865442,2991501
+河北,8297279,4263957,2628649,1404673
+山西,6764665,3643627,2189385,931653
+```
+
+
+
+```shell
+
+
       
 ### 计数
 awk 'NR>2 && $2>262005{count += 1} END{print count"个大于262005的国家"}' population.txt
+
+
+# 同一行多语句采用;分隔
 ### 流程控制
 awk 'NR>2{if($2>4462177) more+=1; else less+=1} END{print "more:",more,"less:",less}' population.txt
 awk 'NR>2 && $2>4462177{more+=1} NR>2 && $2<=4462177{less+=1}END{print "more:",more,"less:",less}' population.txt
 awk 'BEGIN {for(i=0;i<ARGC;i++) printf "%s\t",ARGV[i]; print ""}' population.txt abc def cdg
 ### 数组演示 倒序输出
 awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print addr[i];i-=1}}' population.txt
-```
 
-## 模式
 
-```shell
 # 模式汇总 
 # 1. BEGIN{ statements}
 # 在输入被读取之前, statements 执行一次.
@@ -173,6 +214,8 @@ awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print addr[i];i-=1}}' population.txt
 # BEGIN 与 END 不与其他模式组合. 一个范围模式不能是其他模式的一部分. BEGIN 与 END 是唯一两个不能省略动作的模式.
 # pattern1 与 pattern2 可以匹配同一行. — 译者注
 ```
+
+
 
 ```shell
 # 字符串匹配模式 (string-matching pattern) 测试一个字符串是否包含一段可以被正则 表达式匹配的子字符串
@@ -226,10 +269,10 @@ awk '/f.n/' <<< `echo -e "cat\nbat\nfun\nfin\nfan"`
 
 ## 附录
 
-### AWK常见的内建变量
+### 常见的内建变量
 
 | 内建变量 | 补充默认值 含义                |
-| -------- | ------------------------------ |
+| -------- | :----------------------------- |
 | NF       | 当前记录的字段个数             |
 | NR       | 到目前为止读的记录数量         |
 | FNR      | 当前输入文件的记录个数         |
@@ -241,10 +284,19 @@ awk '/f.n/' <<< `echo -e "cat\nbat\nfun\nfin\nfan"`
 | ORS      | 输出的记录的分割符   "\n"      |
 | RS       | 控制着输入行的记录分割符  "\n" |
 
-```shell
-### 参考 表2.4: 模式
-### 表 2.5: 内建变量
-### 表 2.6: 内建算术函数
-### 表 2.7: 内建字符串函数
-```
+### 常见的内建函数
+
+| 函数                                                     | 含义                                                         |
+| -------------------------------------------------------- | ------------------------------------------------------------ |
+| length(s)                                                | 返回字符串长度                                               |
+| tolower(s)                                               | 字符转为小写。                                               |
+| substr(s,p,n)                                            |                                                              |
+| match(s,r)                                               |                                                              |
+| split(s,a) split(s,a,fs) sprintf(fmt,expr-list) sub(r,s) |                                                              |
+| gsub(r,s) gsub(r,s,t ) index(s,t)                        |                                                              |
+| int(x)                                                   | x 的整数部分; 当 x 大于 0 时, 向 0 取整 log(x) x 的自然对数 (以 e 为底) |
+| sin(x)/cos(x)/sqrt(x)                                    | 正弦/余弦/平方根                                             |
+| rand()                                                   | 随机数  配合 srand(x)使用  x 是 rand() 的新的随机数种子      |
+
+
 
