@@ -3,9 +3,13 @@
 ## 前言
 
 哈喽，大家好，今天给大家介绍一个非常之牛逼的Unix工具**AWK**。
+
 AWK是1977年贝尔实验室的三个哥们( [Alfred Aho](http://en.wikipedia.org/wiki/Alfred_Aho)、[Peter Weinberger](http://en.wikipedia.org/wiki/Peter_J._Weinberger)、 [Brian Kernighan](http://en.wikipedia.org/wiki/Brian_Kernighan) )搞出来的文本分析工具，这三个哥们的首字母拼起来就是AWK的名字了。
+
 AWK虽然是上个世纪的产物，但是它的简洁和丰富的功能可以称之为**神器**！！！
+
 它处理文本就像其他语言处理数值一样方便, 所以经常被应用在文本处理领域，比如日志分析、数据清洗、文本过滤、数据统计等。
+
 同时它也是一门编程语言，不过它的命令行用法就可以覆盖大多数的应用场景，我们通常可以使用一行AWK命令完成一个脚本的任务！！！
 
 这些数据处理工作都有一些共同&显著的特点：
