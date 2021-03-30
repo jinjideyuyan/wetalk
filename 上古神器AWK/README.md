@@ -2,7 +2,11 @@
 
 ## 前言
 
-哈喽，大家好，今天给大家介绍一个非常之牛逼的Unix工具AWK。AWK是1977年贝尔实验室的三个哥们( [Alfred Aho](http://en.wikipedia.org/wiki/Alfred_Aho)、[Peter Weinberger](http://en.wikipedia.org/wiki/Peter_J._Weinberger)、 [Brian Kernighan](http://en.wikipedia.org/wiki/Brian_Kernighan) )搞出来的文本分析工具，这三个哥们的首字母拼起来就是AWK的名字了。AWK虽然是上个世纪的产物，但是它的简洁和丰富的功能可以称之为**神器**！！！ 它处理文本就像其他语言处理数值一样方便, 所以经常被应用在文本处理领域，比如日志分析、数据清洗、文本过滤、数据统计等。同时它也是一门编程语言，不过它的命令行用法就可以覆盖大多数的应用场景，我们通常可以使用一行AWK命令完成一个脚本的任务！！！
+哈喽，大家好，今天给大家介绍一个非常之牛逼的Unix工具**AWK**。
+AWK是1977年贝尔实验室的三个哥们( [Alfred Aho](http://en.wikipedia.org/wiki/Alfred_Aho)、[Peter Weinberger](http://en.wikipedia.org/wiki/Peter_J._Weinberger)、 [Brian Kernighan](http://en.wikipedia.org/wiki/Brian_Kernighan) )搞出来的文本分析工具，这三个哥们的首字母拼起来就是AWK的名字了。
+AWK虽然是上个世纪的产物，但是它的简洁和丰富的功能可以称之为**神器**！！！
+它处理文本就像其他语言处理数值一样方便, 所以经常被应用在文本处理领域，比如日志分析、数据清洗、文本过滤、数据统计等。
+同时它也是一门编程语言，不过它的命令行用法就可以覆盖大多数的应用场景，我们通常可以使用一行AWK命令完成一个脚本的任务！！！
 
 这些数据处理工作都有一些共同&显著的特点：
 
@@ -22,10 +26,11 @@
 
 **(2)    每一列代表固定含义，便于统计**
 
-跟关系型数据库类似，统计文件的每一行的相同列代表同一个含义的数据，这样才具有数据分析意义，比如本文演示数据，第一列表示地区，第二列表示总人口等。
+跟关系型数据库类似，统计文件的每一行的相同列代表同一个含义的数据，这样才具有数据分析意义。
+比如本文演示数据，第一列表示地区，第二列表示总人口等。
 
-> 演示数据来源于国家统计局：各地区户口登记地在外乡镇街道的人口状况。由于演示数据文件行数太多占用篇幅较长，以下演示均只展示前几条数据。
->
+> 演示数据来源于国家统计局：各地区户口登记地在外乡镇街道的人口状况。
+>由于演示数据文件行数太多占用篇幅较长，以下演示均只展示前几条数据。
 
 ```shell
 $ cat population.txt|head -n 10
@@ -53,7 +58,8 @@ awk 'pattern {action}' input_files
 awk 'pattern {action} pattern {action} pattern {action} ...' input_files
 ```
 
-AWK会每次读取一个输入行，对读取到的每一行，按顺序检查每一个模式。如果当前行与模式匹配，则执行对应动作。所以AWK的工作原理就是按顺序执行模式然后执行动作，可以想象到AWK伪代码大概长这样，我猜的(\*^_^\*)。
+AWK会每次读取一个输入行，对读取到的每一行，按顺序检查每一个模式。如果当前行与模式匹配，则执行对应动作。
+所以AWK的工作原理就是按顺序执行模式然后执行动作，可以想象到AWK伪代码大概长这样，我猜的(\*^_^\*)。
 
 ```shell
 ### AWK伪代码  我猜的 (*^_^*)
@@ -71,11 +77,14 @@ while(getline(inputfile))
 }
 ```
 
-由于许多工作都是自动完成的：包括输入, 字段分割, 存储管理, 初始化，所以我们只需要给出串行的"模式–动作"就可以完成对文件的操作！！！大致的流程图如下：
+由于许多工作都是自动完成的：包括输入, 字段分割, 存储管理, 初始化。
+所以我们只需要给出串行的"模式–动作"就可以完成对文件的操作！！！大致的流程图如下：
 
 <img src="https://wetalk-1300208549.cos.ap-nanjing.myqcloud.com/drawImage/awk%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="AWK" style="zoom: 67%;" />
 
-AWK在自动扫描输入文件的同时, 也会按照分隔符(默认空格/Tab)把每一个输入行切分成字段。其中$0表示整行，$1,$2...$n对应表示第一列，第二列...第N列。我们可以用print语句来打印验证。
+AWK在自动扫描输入文件的同时, 也会按照分隔符(默认空格/Tab)把每一个输入行切分成字段。
+其中$0表示整行，$1,$2...$n对应表示第一列，第二列...第N列。
+我们可以用print语句来打印验证。
 
 > 使用print函数由逗号分隔不同的参数，打印结果用空格符分隔，并且会自动换行。(类似于各大语言println函数)。
 
@@ -89,11 +98,8 @@ hello 河北    8297279     4263957      2628649        1404673
 ```
 
 AWK还提供了很多有用的内置变量，如 
-
-NR  (Number Of Record) ：表示读取到的记录数，即当前行号 
-
-FILENAME ：表示当前输入的文件名
-
+NR  (Number Of Record) ：表示读取到的记录数，即当前行号。
+FILENAME ：表示当前输入的文件名。
 NF (Number Of Field) ：表示当前记录的字段个数，即总共多少列，我们通常用这个变量提取一行的最后一列，如下例子所示，总共有5列，$NF代表的就是第五列的值，等价于$5，$(NF-1)表示倒数第二列的值。
 
 ```shell
@@ -152,7 +158,8 @@ $ awk 'length($1) > 6 {print $1,"占用长度：",length($1)}' population.txt
 ```
 
 AWK还提供了一些特殊的模式，比如 BEGIN 和 END。这两个模式不匹配任何输入行。
-当 awk读取数据前，BEGIN 的语句开始执行，通常用于初始化。如下我们可以用BEGIN来给输出打印一个表头。
+当 awk读取数据前，BEGIN 的语句开始执行，通常用于初始化。
+如下我们可以用BEGIN来给输出打印一个表头。
 
 ```shell
 ### 多个 "模式-动作" 并排写就行。
@@ -164,16 +171,19 @@ AREA TOTAL LOCAL OTHER OUTLAND
 山西    6764665     3643627      2189385        931653
 ```
 
-当所有输入被读取完毕，END 的语句开始执行。通常用来收尾。如下我们可以统计一下第二列大于262005的国家，并在END进行打印。
+当所有输入被读取完毕，END 的语句开始执行。通常用来收尾。
+如下我们可以统计一下第二列大于262005的国家，并在END进行打印。
 
 ```shell
 $ awk 'NR>2 && $2>262005{count += 1} END{print count"个大于262005的国家"}' population.txt
 30个大于262005的国家
 ```
 
-同一个动作里的多个语句之间使用分号或者换行进行分割。如下在BEGIN的动作中先指定输出分隔符，接着打印表头。
+同一个动作里的多个语句之间使用分号或者换行进行分割。
+如下在BEGIN的动作中先指定输出分隔符，接着打印表头。
 
-> OFS (Output Formmat Separate) 也是一个内建变量：指定输出字段分割符，如下指定输出时字段采用逗号进行分割
+> OFS (Output Formmat Separate) 也是一个内建变量：指定输出字段分割符。
+> 如下指定输出时字段采用逗号进行分割
 
 ```shell
 $ awk 'BEGIN{OFS=",";print "AREA,TOTAL,LOCAL,OTHER,OUTLAND"} NR>2{print $1,$2,$3,$4,$5}' population.txt|head -n 5
@@ -190,7 +200,8 @@ AWK提供了范围模式可以根据一个区间来匹配多个输入行，范�
 awk 'pattern1,pattern2 {action}' input_file
 ```
 
-AWK从符合 pattern1 的行开始，到符合 pattern2 的行结束 (包括这两行)，对这其中的每一行执行action。如下提取第五行到第十行之间地区的数据。
+AWK从符合 pattern1 的行开始，到符合 pattern2 的行结束 (包括这两行)，对这其中的每一行执行action。
+如下提取第五行到第十行之间地区的数据。
 
 ```shell
 $ awk 'NR==5,NR==10" {print NR,$0}' population.txt
@@ -204,21 +215,64 @@ $ awk 'NR==5,NR==10" {print NR,$0}' population.txt
 
 ## 流程控制
 
-前文提到了AWK也是一门编程语言，所以它支持很多编程语言特性(源于C语言)，比如流程控制语句 if-else 、循环(for，while)；比如数据结构数组等。它们只能用在动作里。
+前文提到了AWK也是一门编程语言，所以它支持很多编程语言特性，与C语言使用类似。
+比如流程控制语句 if-else 、循环(for，while)。
+比如数据结构数组等。
+它们只能用在动作里。
+如下示例使用if-else统计第二列大于4462177 和小于4462177的分别有多少行。
 
 ```shell
-### 流程控制
-awk 'NR>2{if($2>4462177) more+=1; else less+=1} END{print "more:",more,"less:",less}' population.txt
-awk 'NR>2 && $2>4462177{more+=1} NR>2 && $2<=4462177{less+=1}END{print "more:",more,"less:",less}' population.txt
-awk 'BEGIN {for(i=0;i<ARGC;i++) printf "%s\t",ARGV[i]; print ""}' population.txt abc def cdg
-### 数组演示 倒序输出
-awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print addr[i];i-=1}}' population.txt
+$ awk 'NR>2{if($2>4462177) more+=1; else less+=1} END{print "more:",more,"less:",less}' population.txt
+more: 24 less: 7
+```
+
+上面这个例子也可以拆分成多个"模式-动作"来实现。
+
+```shell
+$ awk 'NR>2 && $2>4462177{more+=1} NR>2 && $2<=4462177{less+=1} END{print "more:",more,"less:",less}' population.txt
+more: 24 less: 7
+```
+
+再来看个for循环的例子，打印AWK的命令行参数。
+
+```shell
+$ awk 'BEGIN {for(i=0;i<ARGC;i++) printf "%s\t",ARGV[i]; print ""}' population.txt abc def cdg
+awk	population.txt	abc	def	cdg
+```
+
+ARGC和ARGV也是AWK的内建变量，等价于C语言的参数处理。
+ARGC：命令行参数的个数
+ARGV：命令行参数数组
+
+```c
+// 等价于C语言
+int main(int argc, char *argv[])
+```
+
+AWK也支持数组进行数据存储，如下示例将对输入行进行倒序输出。
+
+```shell
+$ awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print i,addr[i];i-=1}}' population.txt|head -n 5
+33 新疆
+32 宁夏
+31 青海
+30 甘肃
+29 陕西
 ```
 
 ## 正则表达式
 
+AWK 提供了对正则表达式的支持，我们可以在模式中测试一个字符串是否包含一段可以被正则表达式匹配的子字符串。
+
+最简单的正则表达式是仅由数字与字母组成的字符串, 就像 Asia, 它匹配的就是它本身. 为 了将一个正则表达式切换成一个模式, 只需要用一对斜杠包围起来即可:
+
+/Asia/
+ 这个模式匹配那些含有子字符串 Asia 的输入行, 例如 Asia, Asian, 或 Pan-Asiatic. 注意,
+
+正则表达式中空格是有意义的
+
 ```shell
-# 字符串匹配模式 (string-matching pattern) 测试一个字符串是否包含一段可以被正则 表达式匹配的子字符串
+# 字符串匹配模式测试一个字符串是否包含一段可以被正则 表达式匹配的子字符串
 # 4. /regular expression/ { statements}
 # 当碰到这样一个输入行时, statements 就执行: 输入行含有一段字符串, 而该字符串可 以被 regular expression 匹配.
 # 最简单的正则表达式是仅由数字与字母组成的字符串, 就像 Asia, 它匹配的就是它本身. 为了将一个正则表达式切换成一个模式, 只需要用一对斜杠包围起来即可:
@@ -232,13 +286,6 @@ awk '/f.n/' <<< "`echo -e "cat\nbat\nfun\nfin\nfan"`"
 
 ### 这里代办 搞一堆例子 简单介绍正则表达式
 ### 演示一下范围模式  FNR演示
-```
-
-## 内建函数
-
-```shell
-### 内建算数函数 例子演示
-### 内建字符串函数 例子演示
 ```
 
 ## 命令行参数
