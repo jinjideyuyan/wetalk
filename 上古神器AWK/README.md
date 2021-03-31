@@ -146,20 +146,30 @@ population.txt 4 天津 1095282 5 2991501
 population.txt 5 河北 4263957 5 1404673
 ```
 
-常见的内建变量参考：[常见的内建变量](#常见的内建变量)
+常见的内建变量可以去附录查阅：[常见的内建变量](#常见的内建变量) 。
 
-AWK也提供了格式化输出，等价于C语言的printf，格式化规则可以参考：https://en.cppreference.com/w/c/io/fprintf
+AWK也提供了格式化输出函数，跟C语言的printf用法一样。
 
 ```shell
-# printf 格式化输出  printf(format, value1, value2, ... , valuen)
-# todo 补充例子
+$ awk '{printf "%s的外地总人口有:%d,省外人口有:%0.2f\n",$1,$2,$NF}' population.txt|tail -n 5
+陕西的外地总人口有:5894416,省外人口有:974362.00
+甘肃的外地总人口有:3112722,省外人口有:432833.00
+青海的外地总人口有:1140954,省外人口有:318435.00
+宁夏的外地总人口有:1534482,省外人口有:368451.00
+新疆的外地总人口有:4276951,省外人口有:1791642.00
 ```
+
+格式化规则可以参考：https://www.gnu.org/software/gawk/manual/html_node/Control-Letters.html 。
+
+
 
 ## 模式过滤
 
-上面介绍了动作的使用，动作通常用来用来输出展示，模式用来过滤我们想要的记录。
+上面介绍了动作的使用，动作通常用来输出展示。
 
-如下筛选（行号>1 且 第一列大于11074525）的行。
+模式用来过滤我们想要的记录。
+
+如下筛选（行号>1 且 第二列大于11074525）的行。
 
 ```shell
 ### AWK的变量也可以自由进行算术运算(加减乘除)，比如 $2-$3
@@ -173,7 +183,9 @@ $ awk 'NR>1 && $2>11074525 {print NR,$1,$2,$2-$3}' population.txt
 25 四川 11735152 6913850
 ```
 
-AWK的字符串拼接跟shell一样简单粗暴，不需要使用任何运算符，将两个字符串并排放在一起就能实现拼接。
+AWK的字符串拼接跟shell一样简单粗暴，不需要使用任何运算符。
+
+将两个字符串并排放在一起就能实现拼接。
 
 ```shell
 $ awk 'NR>1 {print NR,"开始_"$1"_结束"}' population.txt|head -n 5
@@ -184,7 +196,9 @@ $ awk 'NR>1 {print NR,"开始_"$1"_结束"}' population.txt|head -n 5
 6 开始_山西_结束
 ```
 
-内建函数  多展示几个。。。
+AWK还提供了很多有用的内置函数。
+
+length(s)：用来计算字符串s 中字符的个数。
 
 ```shell
 ### 我的系统编码&文件编码均为UTF-8
@@ -192,6 +206,19 @@ $ awk 'length($1) > 6 {print $1,"占用长度：",length($1)}' population.txt
 内蒙古 占用长度： 9
 黑龙江 占用长度： 9
 ```
+
+substr(s,p)：求字符串s的子串，从位置p开始到末尾。
+
+```shell
+$ awk '{print $1,substr($1,4)}' population.txt|head -n 5
+地区 区
+全国 国
+北京 京
+天津 津
+河北 北
+```
+
+常见的内建函数可以去附录查阅：[常见的内建函数](#常见的内建函数) 。
 
 AWK还提供了一些特殊的模式，比如 BEGIN 和 END。这两个模式不匹配任何输入行。
 
@@ -209,7 +236,7 @@ AREA TOTAL LOCAL OTHER OUTLAND
 山西    6764665     3643627      2189385        931653
 ```
 
-当所有输入被读取完毕，END 的语句开始执行。通常用来收尾。
+当所有输入行被处理完毕，END 的语句开始执行。通常用来收尾。
 
 如下我们可以统计一下第二列大于262005的国家，并在END进行打印。
 
@@ -235,7 +262,9 @@ AREA,TOTAL,LOCAL,OTHER,OUTLAND
 山西,6764665,3643627,2189385,931653
 ```
 
-AWK提供了范围模式可以根据一个区间来匹配多个输入行，范围模式由两个被逗号分开的模式组成。
+AWK提供了范围模式可以根据一个区间来匹配多个输入行。
+
+范围模式由两个被逗号分开的模式组成。
 
 ```shell
 awk 'pattern1,pattern2 {action}' input_file
@@ -254,6 +283,8 @@ $ awk 'NR==5,NR==10" {print NR,$0}' population.txt
 9 吉林    4462177     2604239      1401439        456499
 10 黑龙江  5557828     2800727      2250704        506397
 ```
+
+
 
 ## 流程控制
 
@@ -281,23 +312,27 @@ more: 24 less: 7
 
 再来看个for循环的例子，打印AWK的命令行参数。
 
+命令行参数在输入文件后追加就可以传入。
+
 ```shell
 $ awk 'BEGIN {for(i=0;i<ARGC;i++) printf "%s\t",ARGV[i]; print ""}' population.txt abc def cdg
 awk	population.txt	abc	def	cdg
 ```
 
-ARGC和ARGV也是AWK的内建变量，等价于C语言的参数处理。
+ARGC和ARGV也是AWK的内建变量，跟C语言的参数结构差不多。
 
-ARGC：命令行参数的个数
+ARGC：命令行参数的个数。
 
-ARGV：命令行参数数组
+ARGV：命令行参数数组。
 
 ```c
 // 等价于C语言
 int main(int argc, char *argv[])
 ```
 
-AWK也支持数组进行数据存储，如下示例将对输入行进行倒序输出。
+AWK也支持使用数组进行数据存储。
+
+如下示例将对输入行进行倒序输出。
 
 ```shell
 $ awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print i,addr[i];i-=1}}' population.txt|head -n 5
@@ -308,15 +343,17 @@ $ awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print i,addr[i];i-=1}}' population
 29 陕西
 ```
 
+
+
 ## 正则表达式
 
-AWK 提供了对正则表达式的支持，正则表达式放在一对斜杠里：/regx/。
+AWK 提供了对正则表达式的支持，正则表达式放在一对斜杠里：/regexpr/ 。
 
-AWK使用 "~" 符号表示字符串匹配，"!~"符号表示不匹配。
+AWK使用 "~" 符号表示字符串匹配，"!~" 符号表示不匹配。
 
 所以我们可以在模式中判断一个字符串是否匹配一个正则表达式。
 
-如下示例对  第一列含有“北” 且第二列不包含“88”的行 进行打印。
+如下示例对  第一列含有  “北”  且第二列不包含  “88”  的行 进行打印。
 
 ```shell
 $ awk '$1 ~ /北/ {print}' population.txt
@@ -329,11 +366,11 @@ $ awk '$1 ~ /北/ && $2 !~ /88/ {print}' population.txt
 湖北    9250228     4445565      3791051        1013612
 ```
 
-如果判断整行是否匹配，可以省略 "~"的左值，如下所示。
+如果判断整行是否匹配，可以省略 "~" 的左值，如下所示。
 
 ```shell
-###  /regx/ 相当于 $0  ~ /regx/
-### !/regx/ 相当于 $0 !~ /regx/
+###  /regexpr/ 等价于 $0  ~ /regexpr/
+### !/regexpr/ 等价于 $0 !~ /regexpr/
 $ awk '!/西/ && /88/ {print}' population.txt
 北京    10498288    1582574      1871181        7044533
 内蒙古  7170889     2732591      2994117         1444181
@@ -343,7 +380,9 @@ $ awk '!/西/ && /88/ {print}' population.txt
 青海    1140954     351988       470531         318435
 ```
 
-正则表达式的细节本文不在赘述，使用  [here documents](http://zh.wikipedia.org/wiki/Here文档)   快速验证几个例子。
+正则表达式的语法细节本文不过多说明。
+
+使用  [here documents](http://zh.wikipedia.org/wiki/Here文档)   快速验证几个例子。
 
 ```shell
 ### 匹配小写字母开头的字符串
@@ -358,9 +397,13 @@ $ awk '/^1[3584][0-9]{9}$/' <<< "`echo -e "18894465939\n1364483882\n13644838825\
 13644838825
 ```
 
-## 高级用法
 
-准备了豆瓣电影评分Top250个电影的数据集，CSV格式。
+
+## 进阶用法
+
+接下来换个内容丰富的数据集来演示。
+
+以下是豆瓣电影评分Top250的CSV数据集。
 
 ```shell
 ### 数据格式：排行,电影名,评分,年份,导演,标签,星级
@@ -372,7 +415,9 @@ rank,title,rating_num,year,director,quote,star
 4,这个杀手不太冷,9.4,1994,吕克·贝松 Luc Besson,怪蜀黍和小萝莉不得不说的故事。,1913405
 ```
 
-AWK默认按照  空格/Tab 对每一个输入行进行切分，我们可以使用  -F 参数进行指定分隔符，也支持多个分隔符。
+AWK默认按照  空格/Tab 对每一个输入行进行切分。
+
+我们可以使用  -F 参数进行指定分隔符，也支持多个分隔符。
 
 ```shell
 ### 指定分隔符
@@ -388,9 +433,9 @@ rank title rating_num year
 2 霸王别姬 9 6
 ```
 
-对文件进行拆分，支持使用shell重定向运算符  >  和  >>  
+AWK支持使用shell重定向运算符  >  和  >>  ，可以对文件进行拆分。
 
-评分9以上的另存为douban_more_9.csv，评分9以下的为douban_less_9.csv
+评分9以上的另存为douban_more_9.csv，评分9以下的为douban_less_9.csv。
 
 ```shell
 $ awk -F',' 'NR>1 && $3>=9 {print $0 > "douban_more_9.csv"} NR >1 && $3<9 {print $0 > "douban_less_9.csv"}' douban_top250.csv
@@ -410,13 +455,19 @@ $ cat douban_more_9.csv|head -n 5
 5,泰坦尼克号,9.4,1997,詹姆斯·卡梅隆 James Cameron,失去的才是永恒的。,1695453
 ```
 
-以上语句等价于下面   三目表达式
+AWK也支持三目表达式，上面语句等价于下面。
 
 ```shell
 $ awk -F',' 'NR>1 {print $0 > ($3>=9 ? "douban_more_9.csv":"douban_less_9.csv")}' douban_top250.csv
 ```
 
-文件批量处理 数据量大的时候很管用
+同时我们可以对文件进行批量处理。
+
+比如下面提取第二列和最后一列进行MySQL入库。
+
+这在数据量大的时候很管用。
+
+比如几万、几亿的数据可以快速转化为SQL语句。
 
 ```shell
 ### 注意 双引号只需要斜杠转义：\"
@@ -431,7 +482,7 @@ insert into `movie` (name,star) values ('这个杀手不太冷','1913405');
 insert into `movie` (name,star) values ('泰坦尼克号','1695453');
 ```
 
-统计，统计Top250里各个评分所占数量
+统计Top250里各个评分所占数量。
 
 ```shell
 $ awk -F',' 'NR>1{count[$3]++} END{for(i in count) print "豆瓣电影Top250里评分",i,"的电影有",count[i],"个"}' douban_top250.csv
@@ -452,7 +503,7 @@ $ awk -F',' 'NR>1{count[$3]++} END{for(i in count) print "豆瓣电影Top250里�
 豆瓣电影Top250里评分 8.9 的电影有 38 个
 ```
 
-找出导演相同的电影
+找出Top250里拍过多个电影的导演。
 
 ```shell
 $ awk -F',' 'NR>1{print $5}' douban_top250.csv|sort|uniq -c|sort -rn|head -n 5
@@ -465,7 +516,7 @@ $ awk -F',' 'NR>1{print $5}' douban_top250.csv|sort|uniq -c|sort -rn|head -n 5
 
 找出Top250里即拍过评分9以上 又拍过9分以下的导演。
 
-即求 douban_less_9.csv 和 douban_more_9.csv 两个文件的交集
+即求 douban_less_9.csv 和 douban_more_9.csv 两个文件的交集。
 
 ```shell
 $ awk -F',' 'NR==FNR{map[$5]++} NR>FNR{if($5 in map)print $5}' douban_less_9.csv douban_more_9.csv|sort|uniq -c
@@ -487,7 +538,7 @@ $ awk -F',' 'NR==FNR{map[$5]++} NR>FNR{if($5 in map)print $5}' douban_less_9.csv
    3 克里斯托弗·诺兰 Christopher Nolan
 ```
 
-数组的key可以字符串拼接，这样可以实现二维数组的逻辑。
+数组的key可以字符串拼接，这样可以间接实现二维数组的逻辑。
 
 ```shell
 $ awk -F',' 'NR==2,NR==5{a[$1"-"$2]=$3} END {for (i in a) print i, a[i]}' douban_top250.csv
@@ -497,45 +548,39 @@ $ awk -F',' 'NR==2,NR==5{a[$1"-"$2]=$3} END {for (i in a) print i, a[i]}' douban
 2-霸王别姬 9.6
 ```
 
+数据统计的大部分需求都可以用AWK快速的实现。
 
+比如：过滤、统计、聚合、并集、交集、差集等。
 
-```shell
-### 批量处理
-### CSV
-# 过滤、统计、查找、聚合、分组，类似于mysql 中 where,count(),group by等单表操作
-# 并集、交集、差集、子集，类比于mysql 中 join、where in 操作等
-```
+快试试吧！
 
 ## 附录
 
 ### 常见的内建变量
 
-| 内建变量 | 补充默认值 含义                |
-| -------- | :----------------------------- |
-| NF       | 当前记录的字段个数             |
-| NR       | 到目前为止读的记录数量         |
-| FNR      | 当前输入文件的记录个数         |
-| ARGC     | 命令行参数的个数               |
-| ARGV     | 命令行参数数组                 |
-| FS       | 控制着输入行的字段分割符       |
-| FILENAME | 当前输入文件名                 |
-| OFS      | 输出字段分割符                 |
-| ORS      | 输出的记录的分割符   "\n"      |
-| RS       | 控制着输入行的记录分割符  "\n" |
+| 内建变量 | 补充默认值 含义                                              |
+| -------- | :----------------------------------------------------------- |
+| NF       | 当前记录的字段个数，即总共多少列                             |
+| NR       | 读取到的记录数，即当前行号                                   |
+| FNR      | 当前输入文件的记录个数，区别于NR，NR表示整体的记录数，FNR表示当前文件 |
+| ARGC     | 命令行参数的个数                                             |
+| ARGV     | 命令行参数数组                                               |
+| FS       | 指定输入行的字段分割符                                       |
+| FILENAME | 当前输入文件名                                               |
+| OFS      | 指定输出字段分割符                                           |
+| ORS      | 指定输出的记录分割符   默认是换行 "\n"                       |
+| RS       | 指定输入行的记录分割符   默认是换行 "\n"                     |
 
 ### 常见的内建函数
 
-| 函数                                                     | 含义                                                         |
-| -------------------------------------------------------- | ------------------------------------------------------------ |
-| length(s)                                                | 返回字符串长度                                               |
-| tolower(s)                                               | 字符转为小写。                                               |
-| substr(s,p,n)                                            |                                                              |
-| match(s,r)                                               |                                                              |
-| split(s,a) split(s,a,fs) sprintf(fmt,expr-list) sub(r,s) |                                                              |
-| gsub(r,s) gsub(r,s,t ) index(s,t)                        |                                                              |
-| int(x)                                                   | x 的整数部分; 当 x 大于 0 时, 向 0 取整 log(x) x 的自然对数 (以 e 为底) |
-| sin(x)/cos(x)/sqrt(x)                                    | 正弦/余弦/平方根                                             |
-| rand()                                                   | 随机数  配合 srand(x)使用  x 是 rand() 的新的随机数种子      |
-
-
+| 函数                      | 含义                                                |
+| ------------------------- | --------------------------------------------------- |
+| length(s)                 | 字符串s长度                                         |
+| tolower(s)                | 把字符串转为小写                                    |
+| substr(s, p)              | 字符串s的子串，从位置p开始到末尾                    |
+| split(s, a, fs)           | 把字符串s根据fs进行分割，存到数组a中                |
+| sprintf(fmt,expr-list)    | 跟C语言sprintf一样，用于字符串格式化                |
+| int(x)                    | 取x 的整数部分                                      |
+| sin(x) / cos(x) / sqrt(x) | 正弦 / 余弦 / 平方根                                |
+| rand()                    | 随机数  配合 srand(x)使用  x 是 rand() 的随机数种子 |
 
