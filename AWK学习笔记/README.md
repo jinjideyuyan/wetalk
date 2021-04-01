@@ -40,7 +40,7 @@ AWK所适用的文本处理通常都有一些共同&显著的特点：
 
 > 演示数据来源于国家统计局。
 >
-> [各地区户口登记地在外乡镇街道的人口状况]: https://github.com/jinjideyuyan/wetalk/blob/main/AWK%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/population.txt
+> [各地区户口登记地在外乡镇街道的人口状况](https://github.com/jinjideyuyan/wetalk/blob/main/AWK%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/population.txt)
 >
 > 由于演示数据文件行数太多占用篇幅较长，以下演示均只展示前几条数据。
 
@@ -57,6 +57,8 @@ $ cat population.txt|head -n 10
 吉林    4462177     2604239      1401439        456499
 黑龙江  5557828     2800727      2250704         506397
 ```
+
+本文及相关数据集均上传至GitHub：https://github.com/jinjideyuyan/wetalk/tree/main/AWK%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0
 
 
 
@@ -405,9 +407,7 @@ $ awk '/^1[3584][0-9]{9}$/' <<< "`echo -e "18894465939\n1364483882\n13644838825\
 
 接下来换个内容丰富的数据集来演示。
 
-以下是豆瓣电影评分Top250的CSV数据集。
-
-[豆瓣电影评分Top250]: https://github.com/jinjideyuyan/wetalk/blob/main/AWK%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/douban_top250.csv
+以下是    [豆瓣电影评分Top250](https://github.com/jinjideyuyan/wetalk/blob/main/AWK%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/douban_top250.csv)    的 CSV数据集。
 
 ```shell
 ### 数据格式：排行,电影名,评分,年份,导演,标签,星级
