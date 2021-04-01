@@ -1,4 +1,4 @@
-# 										       							    							 					    						 									AWK
+# 										       							    							 					    						 						 AWK学习笔记
 
 ## 前言
 
@@ -6,11 +6,15 @@
 
 AWK是1977年贝尔实验室的三个哥们( [Alfred Aho](http://en.wikipedia.org/wiki/Alfred_Aho)、[Peter Weinberger](http://en.wikipedia.org/wiki/Peter_J._Weinberger)、 [Brian Kernighan](http://en.wikipedia.org/wiki/Brian_Kernighan) )搞出来的文本分析工具，这三个哥们的首字母拼起来就是AWK的名字了。
 
-AWK虽然是上个世纪的产物，但是它的简洁和丰富的功能可以称之为**神器**！！！
+AWK虽然年代比较久远，但是它的简洁和丰富的功能可以称之为**神器**！！！
 
-它处理文本就像其他语言处理数值一样方便，所以经常被应用在文本处理领域，比如日志分析、数据清洗、文本过滤、数据统计等。
+它处理文本就像其他语言处理数值一样方便，所以经常被应用在文本处理领域。
 
-同时AWK也是一门编程语言，不过它的命令行用法就可以满足大多数的应用场景，我们通常可以使用一行AWK命令完成一个脚本的任务！！！
+比如日志分析、数据清洗、文本过滤、数据统计等。
+
+同时AWK也是一门编程语言，不过它的命令行用法就可以满足大多数的应用场景。
+
+我们通常可以使用一行AWK命令完成一个脚本的任务！！！
 
 AWK所适用的文本处理通常都有一些共同&显著的特点：
 
@@ -70,7 +74,7 @@ $ cat population.txt|head -n 10
 
 一个AWK程序的组成非常简单，它的核心内容是：一个或多个 "模式–动作" 语句序列。
 
-"模式–动作"  序列用单引号包起来，动作放在花括号里，在传入输入文件即可。
+"模式–动作"  序列用单引号包起来，动作放在花括号里，再传入输入文件即可。
 
 ```shell
 ### 一个 模式-动作
@@ -84,7 +88,9 @@ AWK会每次读取一个输入行，对读取到的每一行，按顺序检查�
 
 如果当前行符合模式，则执行对应动作。
 
-所以AWK的工作原理就是按顺序执行模式然后执行动作，可以想象到AWK伪代码大概长这样，我猜的(\*^_^\*)。
+所以AWK的工作原理就是按顺序匹配模式然后执行动作。
+
+可以想象到AWK伪代码大概长这样，我猜的(\*^_^\*)。
 
 ```shell
 ### AWK伪代码  我猜的 (*^_^*)
@@ -110,7 +116,7 @@ AWK在自动扫描输入文件的同时, 也会按照分隔符(默认空格/Tab)
 
 <img src="https://wetalk-1300208549.cos.ap-nanjing.myqcloud.com/drawImage/awk%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="AWK" style="zoom: 67%;" />
 
-大部分的工作都是AWK自动完成的：包括按行输入，字段分割，存储管理，初始化。
+大部分的工作都是AWK自动完成的：包括按行输入，字段分割，字段存储等。
 
 所以我们只需要给出 "模式–动作" 序列就可以完成对文件的操作！！！
 
@@ -118,7 +124,7 @@ AWK在自动扫描输入文件的同时, 也会按照分隔符(默认空格/Tab)
 
 > print函数使用逗号分隔不同的参数，打印结果用空格符分隔，并且会自动换行。(类似于各大语言println函数)。
 >
-> 不写模式就是匹配所有行。
+> 模式可以省略，表示匹配所有行。
 
 ```shell
 $ awk '{print "hello",$0}' population.txt|head -n 5
@@ -205,7 +211,7 @@ AWK还提供了很多有用的内置函数。
 length(s)：用来计算字符串s 中字符的个数。
 
 ```shell
-### 我的系统编码&文件编码均为UTF-8
+### 我的系统编码 & 文件编码均为UTF-8
 $ awk 'length($1) > 6 {print $1,"占用长度：",length($1)}' population.txt
 内蒙古 占用长度： 9
 黑龙江 占用长度： 9
@@ -228,7 +234,7 @@ AWK还提供了一些特殊的模式，比如 BEGIN 和 END。这两个模式不
 
 当 awk读取数据前，BEGIN 的语句开始执行，通常用于初始化。
 
-如下我们可以用BEGIN来给输出打印一个表头。
+例如我们可以用BEGIN来给输出打印一个表头。
 
 ```shell
 ### 多个 "模式-动作" 并排写就行。
@@ -242,7 +248,7 @@ AREA TOTAL LOCAL OTHER OUTLAND
 
 当所有输入行被处理完毕，END 的语句开始执行。通常用来收尾。
 
-如下我们可以统计一下第二列大于262005的国家，并在END进行打印。
+例如我们可以统计一下第二列大于262005的国家，并在END进行打印。
 
 ```shell
 $ awk 'NR>2 && $2>262005{count += 1} END{print count"个大于262005的国家"}' population.txt
@@ -254,8 +260,8 @@ $ awk 'NR>2 && $2>262005{count += 1} END{print count"个大于262005的国家"}'
 如下在BEGIN的动作中先指定输出分隔符，接着打印表头。
 
 > OFS (Output Formmat Separate) 也是一个内建变量：指定输出字段分割符。
->
-> 如下指定输出时字段采用逗号进行分割
+
+如下指定输出时字段采用逗号进行分割。
 
 ```shell
 $ awk 'BEGIN{OFS=",";print "AREA,TOTAL,LOCAL,OTHER,OUTLAND"} NR>2{print $1,$2,$3,$4,$5}' population.txt|head -n 5
@@ -439,7 +445,7 @@ rank title rating_num year
 
 AWK支持使用shell重定向运算符  >  和  >>  ，可以对文件进行拆分。
 
-评分9以上的另存为douban_more_9.csv，评分9以下的为douban_less_9.csv。
+如下将 评分9以上的另存为douban_more_9.csv，评分9以下的为douban_less_9.csv。
 
 ```shell
 $ awk -F',' 'NR>1 && $3>=9 {print $0 > "douban_more_9.csv"} NR >1 && $3<9 {print $0 > "douban_less_9.csv"}' douban_top250.csv
@@ -556,7 +562,7 @@ $ awk -F',' 'NR==2,NR==5{a[$1"-"$2]=$3} END {for (i in a) print i, a[i]}' douban
 
 比如：过滤、统计、聚合、并集、交集、差集等。
 
-快试试吧！
+快来试试吧！！！
 
 ## 附录
 
