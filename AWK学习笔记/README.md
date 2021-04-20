@@ -6,7 +6,7 @@
 
 AWK是1977年贝尔实验室的三个哥们( [Alfred Aho](http://en.wikipedia.org/wiki/Alfred_Aho)、[Peter Weinberger](http://en.wikipedia.org/wiki/Peter_J._Weinberger)、 [Brian Kernighan](http://en.wikipedia.org/wiki/Brian_Kernighan) )搞出来的文本分析工具，这三个哥们的首字母拼起来就是AWK的名字了。
 
-AWK虽然年代比较久远，但是它的简洁和丰富的功能可以称之为**神器**！！！
+AWK虽然是一个比较老的工具，但是它的简洁和丰富的功能可以称之为**神器**！！！
 
 它处理文本就像其他语言处理数值一样方便，所以经常被应用在文本处理领域。
 
@@ -208,7 +208,7 @@ $ awk 'NR>1 {print NR,"开始_"$1"_结束"}' population.txt|head -n 5
 
 AWK还提供了很多有用的内置函数。
 
-length(s)：用来计算字符串s 中字符的个数。
+length(s)：用来计算字符串s 的长度。
 
 ```shell
 ### 我的系统编码 & 文件编码均为UTF-8
@@ -248,11 +248,11 @@ AREA TOTAL LOCAL OTHER OUTLAND
 
 当所有输入行被处理完毕，END 的语句开始执行。通常用来收尾。
 
-例如我们可以统计一下第二列大于262005的国家，并在END进行打印。
+例如我们可以统计一下第二列大于262005的省份，并在END进行打印。
 
 ```shell
-$ awk 'NR>2 && $2>262005{count += 1} END{print count"个大于262005的国家"}' population.txt
-30个大于262005的国家
+$ awk 'NR>2 && $2>262005{count += 1} END{print count"个大于262005的省份"}' population.txt
+30个大于262005的省份
 ```
 
 同一个动作里的多个语句之间使用分号或者换行进行分割。
@@ -345,7 +345,7 @@ AWK也支持使用数组进行数据存储。
 如下示例将对输入行进行倒序输出。
 
 ```shell
-$ awk 'NR>2{addr[NR]=$1} END{i=NR; while(i>2){print i,addr[i];i-=1}}' population.txt|head -n 5
+$ awk '{addr[NR]=$1} END{i=NR; while(i>0){print i,addr[i];i-=1}}' population.txt|head -n 5
 33 新疆
 32 宁夏
 31 青海
@@ -583,14 +583,17 @@ $ awk -F',' 'NR==2,NR==5{a[$1"-"$2]=$3} END {for (i in a) print i, a[i]}' douban
 
 ### 常见的内建函数
 
-| 函数                      | 含义                                                |
-| ------------------------- | --------------------------------------------------- |
-| length(s)                 | 字符串s长度                                         |
-| tolower(s)                | 把字符串转为小写                                    |
-| substr(s, p)              | 字符串s的子串，从位置p开始到末尾                    |
-| split(s, a, fs)           | 把字符串s根据fs进行分割，存到数组a中                |
-| sprintf(fmt,expr-list)    | 跟C语言sprintf一样，用于字符串格式化                |
-| int(x)                    | 取x 的整数部分                                      |
-| sin(x) / cos(x) / sqrt(x) | 正弦 / 余弦 / 平方根                                |
-| rand()                    | 随机数  配合 srand(x)使用  x 是 rand() 的随机数种子 |
+| 函数                      | 含义                                                 |
+| ------------------------- | ---------------------------------------------------- |
+| length(s)                 | 字符串s长度                                          |
+| tolower(s)                | 把字符串转为小写                                     |
+| substr(s, p)              | 字符串s的子串，从位置p开始到末尾                     |
+| split(s, a, fs)           | 把字符串s根据fs进行分割，存到数组a中                 |
+| sprintf(fmt,expr-list)    | 跟C语言sprintf一样，用于字符串格式化                 |
+| int(x)                    | 取x 的整数部分                                       |
+| sin(x) / cos(x) / sqrt(x) | 正弦 / 余弦 / 平方根                                 |
+| rand()                    | 随机数  配合 srand(x)使用  x 是 rand() 的随机数种子  |
+| match(s,r)                | 正则表达式匹配，测试 s 是否包含能被 r 匹配的子串     |
+| sub(r,s)                  | 正则表达式替换，将 $0 的第一个被r匹配的子串替换为s   |
+| gsub(r,s)                 | 正则表达式全局替换，将 $0 中所有被r匹配的子串替换为s |
 
