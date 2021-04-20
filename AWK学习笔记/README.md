@@ -114,7 +114,7 @@ AWK在自动扫描输入文件的同时, 也会按照分隔符(默认空格/Tab)
 
 大致的流程图如下：
 
-<img src="https://wetalk-1300208549.cos.ap-nanjing.myqcloud.com/drawImage/awk%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="AWK" style="zoom: 67%;" />
+<img src="https://github.com/jinjideyuyan/wetalk/blob/main/img/awk流程图.png?raw=true" alt="AWK" style="zoom: 67%;" />
 
 大部分的工作都是AWK自动完成的：包括按行输入，字段分割，字段存储等。
 
